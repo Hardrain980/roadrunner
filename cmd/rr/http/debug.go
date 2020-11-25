@@ -16,11 +16,9 @@ import (
 
 func init() {
 	cobra.OnInitialize(func() {
-		if rr.Debug {
-			svc, _ := rr.Container.Get(rrhttp.ID)
-			if svc, ok := svc.(*rrhttp.Service); ok {
-				svc.AddListener((&debugger{logger: rr.Logger}).listener)
-			}
+		svc, _ := rr.Container.Get(rrhttp.ID)
+		if svc, ok := svc.(*rrhttp.Service); ok {
+			svc.AddListener((&debugger{logger: rr.Logger}).listener)
 		}
 	})
 }

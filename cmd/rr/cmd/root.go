@@ -38,6 +38,9 @@ var (
 	override                    []string
 	mergeJson                   string
 
+	// LogLevel sets threshold of log level to display
+	LogLevel string
+
 	// Verbose enables verbosity mode (container specific).
 	Verbose bool
 
@@ -74,6 +77,7 @@ func Execute() {
 func init() {
 	CLI.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
 	CLI.PersistentFlags().BoolVarP(&Debug, "debug", "d", false, "debug mode")
+	CLI.PersistentFlags().StringVarP(&LogLevel, "logLevel", "k", "warn", "log level (panic, fatal, error, warn, info, debug, trace)")
 	CLI.PersistentFlags().StringVarP(&logFormat, "logFormat", "l", "color", "select log formatter (color, json, plain)")
 	CLI.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is .rr.yaml)")
 	CLI.PersistentFlags().StringVarP(&workDir, "workDir", "w", "", "work directory")
@@ -90,6 +94,15 @@ func init() {
 	cobra.OnInitialize(func() {
 		if Verbose {
 			Logger.SetLevel(logrus.DebugLevel)
+		} else  {
+			level, err := logrus.ParseLevel(LogLevel)
+
+			if err != nil {
+				Logger.Warnf("Invalid log level: %s", LogLevel)
+				return
+			}
+
+			Logger.SetLevel(level)
 		}
 
 		configureLogger(logFormat)
